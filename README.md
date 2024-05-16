@@ -1,6 +1,6 @@
 # Position-induced Transformer
 
-The code in this repository presents six numerical experiments of using Position-induced Transformer (PiT) for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be downloaded via <a href="https://arxiv.org/pdf/2405.09285">here</a>.
+The code in this repository presents six numerical experiments of using Position-induced Transformer (PiT) for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning* (ICML 2024, Vienna). The paper can be downloaded <a href="https://arxiv.org/pdf/2405.09285">here</a>.
 
 PiT is discretization convergent. On the Darcy2D benchmark, a PiT model trained with data at 43x43 resolution can produce accurate predictions given input data at 421x421 resolution.
 
@@ -36,7 +36,7 @@ We provide the <a href="https://drive.google.com/drive/folders/17h98Mqcjw7YVginr
 
 ## Requirements
 - We have run the experiments on a linux OS, with `python==3.10.0`, `CUDA==11.8`, `tensorflow==2.10.0`, and `tensorflow_probability==0.18`. `matplotlib` and `scipy` are also needed for plotting and data loading.
-- Since the version of `2.15.0`, Tensorflow supports installing its NVIDIA CUDA library dependencies through pip. This, for people who know both Tensorflow and PyTorch, represents a great improvement for Tensorflow. We provide the `requirements.txt` file
+- Since the version of `2.15`, Tensorflow supports installing its NVIDIA CUDA library dependencies through pip. This, for people who know both Tensorflow and PyTorch, represents a great improvement for Tensorflow. We provide the `requirements.txt` file
 
         --extra-index-url https://pypi.nvidia.com
         tensorflow[and-cuda]==2.15
@@ -44,7 +44,7 @@ We provide the <a href="https://drive.google.com/drive/folders/17h98Mqcjw7YVginr
         matplotlib
         scipy
 
-    to facilitate running our code with `tensorflow==2.15.0` and `tensorflow_probability==0.23`. As long as the NVIDIA driver is up to date, simply run
+    to facilitate running our code with `tensorflow==2.15` and `tensorflow_probability==0.23`. As long as the NVIDIA driver is up to date, simply run
     
     `python -m pip install -r requirements.txt`
     
@@ -52,12 +52,11 @@ We provide the <a href="https://drive.google.com/drive/folders/17h98Mqcjw7YVginr
 
 ## Citations
 ```
-@misc{chen2024positional,
-      title={Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning}, 
-      author={Junfeng Chen and Kailiang Wu},
-      year={2024},
-      eprint={2405.09285},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG}
+@inproceedings{chen2024positional,
+               title={Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning},
+               author={Junfeng Chen and Kailiang Wu},
+               booktitle={International conference on machine learning},
+               year={2024},
+               organization={PMLR}
 }
 ```
