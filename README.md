@@ -1,8 +1,8 @@
 # Position-induced Transformer
 
-The code in this repository presents six numerical experiments of using Position-induced Transformer (PiT) for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning* (ICML 2024, Vienna). The paper can be downloaded <a href="https://arxiv.org/pdf/2405.09285">here</a>.
+The code in this repository presents six numerical experiments of using Position-induced Transformer (PiT) for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be downloaded <a href="https://arxiv.org/pdf/2405.09285">here</a>.
 
-PiT is discretization convergent. On the Darcy2D benchmark, a PiT model trained with data at 43x43 resolution can produce accurate predictions given input data at 421x421 resolution.
+PiT is discretization convergent, giving consistent and convergent predictions as the input data is refined. On the Darcy2D benchmark, a PiT model trained with data at 43x43 resolution can produce accurate predictions given input data at 421x421 resolution.
 
 <p align="center">
   <img width="1500" alt="" src="figures/Darcy2D.png">
@@ -14,10 +14,17 @@ PiT can learn the dynamics governed by the incompressible Navier&ndash;Stokes eq
   <img width="200" alt="" src="figures/true_t20.png">&nbsp;&nbsp;&nbsp;&nbsp;<img width="200" alt="" src="figures/pred_t20.png">
 </p>
 
-PiT is able to approximate highly nonlinear operators. A PiT model can capture discontinuities displayed in the solutions of hyperbolic PDEs. Left: one-dimensional inviscid Burgers' equation. Right: one-dimensional compressible Euler equations.
+PiT is able to approximate highly nonlinear operators. A PiT model can capture discontinuities displayed in the solutions of hyperbolic PDEs. Top left: one-dimensional inviscid Burgers' equation. Top right: one-dimensional compressible Euler equations. Bottom: two-dimensional compressible Euler equations.
 
 <p align="center">
   <img width="350" alt="" src="figures/InviscidBurgers.png"> <img width="350" alt="" src="figures/ShockTube.png">
+  <img width="800" alt="" src="figures/NACA.png">
+</p>
+
+PiT can handle irregular point clouds and effectively treat arbitrary boundary conditions.
+
+<p align="center">
+  <img width="800" alt="" src="figures/Elasticity.png">
 </p>
 
 ## Contents
@@ -48,7 +55,7 @@ We provide the <a href="https://drive.google.com/drive/folders/17h98Mqcjw7YVginr
     
     `python -m pip install -r requirements.txt`
     
-    in an environment with `python>=3.9`. This will set up all the necessary dependencies, with no more need for manually installing CUDA stuff.
+    in an environment with `python=3.9-3.11`. This will set up all the necessary dependencies, with no more need for manually installing CUDA stuff.
 
 ## Citations
 ```

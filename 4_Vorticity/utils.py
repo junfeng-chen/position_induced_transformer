@@ -121,11 +121,18 @@ class reccurent_PiT(tf.keras.Model):
             x = tf.concat([x[...,1:],y], axis=-1)
         return pred[...,1:]
     def get_config(self):
-        config = {
-        'network': self.PiT,
-        'steps': self.step
-        }
+        config = super(reccurent_PiT, self).get_config()
+        config.update({
+            'network': self.PiT.get_config(),  # Store the config of the network instead of the network itself
+            'steps': self.steps,
+        })
         return config
+    
+    @classmethod
+    def from_config(cls, config):
+        network_config = config.pop('network')
+        network = tf.keras.Model.from_config(network_config)
+        return cls(network=network, **config)
 
 class MultiHeadPosAtt(tf.keras.layers.Layer):
     '''
