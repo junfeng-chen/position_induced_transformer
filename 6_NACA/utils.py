@@ -39,9 +39,8 @@ def pairwise_dist(res1x, res1y, res2x, res2y):
     grid2 = tf.tile(tf.expand_dims(grid2, 0), [grid1.shape[0],1,1])
 
     dist  = tf.norm(grid1-grid2, axis=-1)
-    print(dist.shape, tf.math.reduce_max(dist))
     dist2 = tf.cast(dist**2, 'float32')
-    return dist2/tf.math.reduce_max(dist2)
+    return dist2/2
 
 def load_data(path, ntrain, ntest):
     vertices_x = load(path + "NACA_Cylinder_X.npy")[...,newaxis]

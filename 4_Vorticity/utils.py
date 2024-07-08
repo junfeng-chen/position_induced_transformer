@@ -58,9 +58,8 @@ def pairwise_dist(res1x, res1y, res2x, res2y):
     dist  = tf.math.minimum(dist, tf.norm(grid1+tf.constant([[-1,0]], dtype='float64')-grid2, axis=-1))
     dist  = tf.math.minimum(dist, tf.norm(grid1+tf.constant([[0,1]], dtype='float64')-grid2, axis=-1))
     dist  = tf.math.minimum(dist, tf.norm(grid1+tf.constant([[0,-1]], dtype='float64')-grid2, axis=-1))
-    print(dist.shape, tf.math.reduce_max(dist))
     dist2 = tf.cast(dist**2, 'float32')
-    return dist2/tf.math.reduce_max(dist2)
+    return dist2
 
 def load_data(file_path, ntrain, ntest):
 

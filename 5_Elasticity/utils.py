@@ -35,8 +35,8 @@ def load_data(path, ntrain, ntest):
     m_train = loadmat(path + "m_dist1.mat")["m_dist"][:ntrain,...]
     m_test  = loadmat(path + "m_dist2.mat")["m_dist"][-ntest:,...]
     
-    m_test  = m_test / m_train.max()
-    m_train = m_train / m_train.max()
+    m_test  = m_test / 2
+    m_train = m_train / 2
 
     return m_train.astype("float32"), m_test.astype("float32"), X[:ntrain,...].astype("float32"), Y[:ntrain,...].astype("float32"), X[-ntest:,...].astype("float32"), Y[-ntest:,...].astype("float32")
 
