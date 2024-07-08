@@ -11,7 +11,7 @@ import tensorflow_probability as tfp
 
 class rel_norm(tf.keras.losses.Loss):
     '''
-    Compute the average relative l2 loss between a batch of true and predictions
+    Compute the average relative l2 loss between a batch of targets and predictions
     '''
     def __init__(self):
         super().__init__()
@@ -49,8 +49,8 @@ class mlp(tf.keras.layers.Layer):
 
         self.width1 = n_filters1
         self.width2 = n_filters2
-        self.mlp1 = tf.keras.layers.Dense(self.width1, activation='gelu', kernel_initializer="lecun_normal")
-        self.mlp2 = tf.keras.layers.Dense(self.width2, kernel_initializer="lecun_normal")
+        self.mlp1 = tf.keras.layers.Dense(self.width1, activation='gelu', kernel_initializer="he_normal")
+        self.mlp2 = tf.keras.layers.Dense(self.width2, kernel_initializer="he_normal")
 
     def call(self, inputs):
         x = self.mlp1(inputs)
@@ -83,7 +83,7 @@ class MultiHeadPosAtt(tf.keras.layers.Layer):
 
         self.weight = self.add_weight(
             shape=(self.n_head, self.hid_dim, self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="weight",
         )
@@ -139,20 +139,20 @@ class PiT(tf.keras.Model):
         self.n_blocks = 4 # number of position-attention modules in the Processor
         
         # Encoder
-        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="lecun_normal")
+        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="he_normal")
         self.down     = MultiHeadPosAtt(self.n_head, self.hid_dim, locality=self.en_local)
         self.mlp1     = mlp(self.hid_dim, self.hid_dim)
-        self.w1       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal")
+        self.w1       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
 
         # Processor
         self.PA       = [MultiHeadPosAtt(self.n_head, self.hid_dim, locality=200) for i in range(self.n_blocks)]
         self.MLP      = [mlp(self.hid_dim, self.hid_dim) for i in range(self.n_blocks)]
-        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal") for i in range(self.n_blocks)]
+        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal") for i in range(self.n_blocks)]
 
         # Decoder
         self.up       = MultiHeadPosAtt(self.n_head, self.hid_dim, locality=self.de_local)
         self.mlp2     = mlp(self.hid_dim, self.hid_dim)
-        self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal")
+        self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
         self.de_layer = mlp(self.hid_dim, self.out_dim)
         
     def call(self, m_dist, inputs):
@@ -198,21 +198,21 @@ class MultiHeadSelfAtt(tf.keras.layers.Layer):
 
         self.q = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="query",
         )    
         
         self.k = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="key",
         )
 
         self.v = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="value",
         )
@@ -253,20 +253,20 @@ class LiteTransformer(tf.keras.Model):
         self.n_blocks = 4
 
         # Encoder
-        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="lecun_normal")
+        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="he_normal")
         self.down     = MultiHeadPosAtt(self.n_head, self.hid_dim, self.en_local)
         self.mlp1     = mlp(self.hid_dim, self.hid_dim)
-        self.w1       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal")
+        self.w1       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
         
         # Processor
         self.PA       = [MultiHeadSelfAtt(self.n_head, self.hid_dim) for i in range(self.n_blocks)]
         self.MLP      = [mlp(self.hid_dim, self.hid_dim) for i in range(self.n_blocks)]
-        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal") for i in range(self.n_blocks)]
+        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal") for i in range(self.n_blocks)]
 
         # Decoder
         self.up       = MultiHeadPosAtt(self.n_head, self.hid_dim, self.de_local)
         self.mlp2     = mlp(self.hid_dim, self.hid_dim)
-        self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal")
+        self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
         self.de_layer = mlp(self.hid_dim, self.out_dim)
         
     def call(self, m_dist, inputs):
@@ -311,20 +311,20 @@ class Transformer(tf.keras.Model):
         self.n_blocks = 4
 
         # Encoder
-        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="lecun_normal")
+        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="he_normal")
         self.down     = MultiHeadSelfAtt(self.n_head, self.hid_dim)
         self.mlp1     = mlp(self.hid_dim, self.hid_dim)
-        self.w1       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal")
+        self.w1       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
         
         # Processor
         self.PA       = [MultiHeadSelfAtt(self.n_head, self.hid_dim) for i in range(self.n_blocks)]
         self.MLP      = [mlp(self.hid_dim, self.hid_dim) for i in range(self.n_blocks)]
-        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal") for i in range(self.n_blocks)]
+        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal") for i in range(self.n_blocks)]
 
         # Decoder
         self.up       = MultiHeadSelfAtt(self.n_head, self.hid_dim)
         self.mlp2     = mlp(self.hid_dim, self.hid_dim)
-        self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal")
+        self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
         self.de_layer = mlp(self.hid_dim, self.out_dim)
         
     def call(self, inputs):

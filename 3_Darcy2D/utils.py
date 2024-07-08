@@ -41,7 +41,7 @@ class PixelWiseNormalization():
 
 class rel_norm(tf.keras.losses.Loss):
     '''
-    Compute the average relative l2 loss between a batch of true and predictions
+    Compute the average relative l2 loss between a batch of targets and predictions
     '''
     def __init__(self):
         super().__init__()
@@ -73,7 +73,7 @@ def pairwise_dist(res1x, res1y, res2x, res2y):
     dist  = tf.norm(grid1-grid2, axis=-1)
     print(dist.shape, tf.math.reduce_max(dist))
     dist2 = tf.cast(dist**2, 'float32')
-    return dist2/tf.math.reduce_max(dist2)
+    return dist2/2.0
 
 def load_data(train_path, test_path, downsampling, ntrain, ntest):
 
@@ -102,8 +102,8 @@ class mlp(tf.keras.layers.Layer):
 
         self.width1 = n_filters1
         self.width2 = n_filters2
-        self.mlp1 = tf.keras.layers.Dense(self.width1, activation='gelu', kernel_initializer="lecun_normal")
-        self.mlp2 = tf.keras.layers.Dense(self.width2, kernel_initializer="lecun_normal")
+        self.mlp1 = tf.keras.layers.Dense(self.width1, activation='gelu', kernel_initializer="he_normal")
+        self.mlp2 = tf.keras.layers.Dense(self.width2, kernel_initializer="he_normal")
 
     def call(self, inputs):
         x = self.mlp1(inputs)
@@ -146,14 +146,14 @@ class MultiHeadPosAtt(tf.keras.layers.Layer):
 
         self.weight = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="weight",
         )
         self.built = True
 
     def call(self, inputs):
-        scaled_dist = self.dist * tf.math.tan(0.25*pi*(1.0+tf.math.sin(self.r)))# tan(0.25*pi*(1+sin(r))) leads to higher accuracy than using r^2 and tan(r) # (n_head, L, L)
+        scaled_dist = self.dist * tf.math.tan(0.25*pi*(1-1e-7)*(1.0+tf.math.sin(self.r)))# tan(0.25*pi*(1+sin(r))) leads to higher accuracy than using r^2 and tan(r) # (n_head, L, L)
         if self.locality <= 100:
             mask = tfp.stats.percentile(scaled_dist, self.locality, interpolation="linear", axis=-1, keepdims=True)
             scaled_dist = tf.where(scaled_dist<=mask, scaled_dist, tf.float32.max)
@@ -207,13 +207,13 @@ class PiT(tf.keras.Model):
         self.YNormalizer = YNormalizer
 
         # Encoder
-        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="lecun_normal")
+        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="he_normal")
         self.down     = MultiHeadPosAtt(tf.transpose(self.m_cross), self.n_head, self.hid_dim, locality=self.en_local)
         
         # Processor
         self.PA       = [MultiHeadPosAtt(self.m_small, self.n_head, self.hid_dim, locality=200) for i in range(self.n_blocks)]
         self.MLP      = [mlp(self.hid_dim, self.hid_dim) for i in range(self.n_blocks)]
-        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal") for i in range(self.n_blocks)]
+        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal") for i in range(self.n_blocks)]
 
         # Decoder
         self.up       = MultiHeadPosAtt(self.m_cross, self.n_head, self.hid_dim, locality=self.de_local)
@@ -276,21 +276,21 @@ class MultiHeadSelfAtt(tf.keras.layers.Layer):
 
         self.q = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="query",
         )    
         
         self.k = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="key",
         )
 
         self.v = self.add_weight(
             shape=(self.n_head, input_shape[-1], self.v_dim),
-            initializer="lecun_normal",
+            initializer="he_normal",
             trainable=True,
             name="value",
         )
@@ -334,13 +334,13 @@ class LiteTransformer(tf.keras.Model):
         self.n_blocks = 4
 
         # Encoder
-        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="lecun_normal")
+        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="he_normal")
         self.down     = MultiHeadPosAtt(tf.transpose(self.m_cross), self.n_head, self.hid_dim, locality=self.en_local)
         
         # Processor
         self.PA       = [MultiHeadSelfAtt(self.n_head, self.hid_dim) for i in range(self.n_blocks)]
         self.MLP      = [mlp(self.hid_dim, self.hid_dim) for i in range(self.n_blocks)]
-        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal") for i in range(self.n_blocks)]
+        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal") for i in range(self.n_blocks)]
 
         # Decoder
         self.up       = MultiHeadPosAtt(self.m_cross, self.n_head, self.hid_dim, locality=self.de_local)
@@ -403,13 +403,13 @@ class Transformer(tf.keras.Model):
         self.YNormalizer = YNormalizer
 
         # Encoder
-        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="lecun_normal")
+        self.en_layer = tf.keras.layers.Dense(self.hid_dim, activation="gelu", kernel_initializer="he_normal")
         self.down     = MultiHeadSelfAtt(self.n_head, self.hid_dim)
         
         # Processor
         self.PA       = [MultiHeadSelfAtt(self.n_head, self.hid_dim) for i in range(self.n_blocks)]
         self.MLP      = [mlp(self.hid_dim, self.hid_dim) for i in range(self.n_blocks)]
-        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="lecun_normal") for i in range(self.n_blocks)]
+        self.W        = [tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal") for i in range(self.n_blocks)]
 
         # Decoder
         self.up       = MultiHeadSelfAtt(self.n_head, self.hid_dim)
