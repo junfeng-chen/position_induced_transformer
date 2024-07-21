@@ -30,15 +30,9 @@ def load_data(path, ntrain, ntest):
     X = np.transpose(np.load(path + "Random_UnitCell_XY_10.npy"), (2,0,1)) #(2000,972,2)
     R = np.repeat(5*R-1, X.shape[1], 1) #(2000,972,42)
     X = np.concatenate((X,R), axis=-1) #(2000,972,46)
-    Y       = np.transpose(np.load(path + "Random_UnitCell_sigma_10.npy"), (1,0))[...,np.newaxis]
+    Y = np.transpose(np.load(path + "Random_UnitCell_sigma_10.npy"), (1,0))[...,np.newaxis]
 
-    m_train = loadmat(path + "m_dist1.mat")["m_dist"][:ntrain,...]
-    m_test  = loadmat(path + "m_dist2.mat")["m_dist"][-ntest:,...]
-    
-    m_test  = m_test / 2
-    m_train = m_train / 2
-
-    return m_train.astype("float32"), m_test.astype("float32"), X[:ntrain,...].astype("float32"), Y[:ntrain,...].astype("float32"), X[-ntest:,...].astype("float32"), Y[-ntest:,...].astype("float32")
+    return X[:ntrain,...].astype("float32"), Y[:ntrain,...].astype("float32"), X[-ntest:,...].astype("float32"), Y[-ntest:,...].astype("float32")
 
 class mlp(tf.keras.layers.Layer):
     '''
@@ -155,7 +149,9 @@ class PiT(tf.keras.Model):
         self.w2       = tf.keras.layers.Dense(self.hid_dim, kernel_initializer="he_normal")
         self.de_layer = mlp(self.hid_dim, self.out_dim)
         
-    def call(self, m_dist, inputs):
+    def call(self, inputs):
+
+        m_dist = self.pairwise_dist(inputs[...,:2])
 
         # Encoder
         en    = self.en_layer(inputs)  # (batch_size, L_qry, hid_dim)
@@ -172,6 +168,13 @@ class PiT(tf.keras.Model):
         de    = tf.keras.activations.gelu(de) # (batch_size, L_qry, hid_dim)
         de    = self.de_layer(de) # (batch_size, L_qry, out_dim)
         return de
+
+    def pairwise_dist(self, mesh):
+        
+        mesh          = tf.expand_dims(mesh, axis=1)
+        pairwise_diff = mesh - tf.transpose(mesh, (0,2,1,3))
+        pairwise_dist = tf.norm(pairwise_diff, ord=2, axis=-1)
+        return pairwise_dist**2 / 2.0
     
     def get_config(self):
         config = {
@@ -271,6 +274,8 @@ class LiteTransformer(tf.keras.Model):
         
     def call(self, m_dist, inputs):
 
+        m_dist = self.pairwise_dist(inputs[...,:2])
+
         # Encoder
         en    = self.en_layer(inputs)
         x     = self.mlp1(self.down(m_dist, en)) + self.w1(en)
@@ -287,6 +292,13 @@ class LiteTransformer(tf.keras.Model):
         de    = self.de_layer(de) 
 
         return de
+
+    def pairwise_dist(self, mesh):
+        
+        mesh          = tf.expand_dims(mesh, axis=1)
+        pairwise_diff = mesh - tf.transpose(mesh, (0,2,1,3))
+        pairwise_dist = tf.norm(pairwise_diff, ord=2, axis=-1)
+        return pairwise_dist**2 / 2.0
     
     def get_config(self):
         config = {
