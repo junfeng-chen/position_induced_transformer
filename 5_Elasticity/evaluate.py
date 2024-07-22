@@ -9,20 +9,19 @@ from utils import *
 # params ##################################33
 encode_dim  = 512
 out_dim     = 1
-n_head      = 2
+n_head      = 8
 n_train     = 1000
 n_test      = 200
 
 # load dataset
-m_train, m_test, trainX, trainY, testX, testY= load_data("./", n_train, n_test)
-print(m_train.shape, m_test.shape, trainX.shape, trainY.shape, testX.shape, testY.shape)
+trainX, trainY, testX, testY= load_data("./", n_train, n_test)
+print(trainX.shape, trainY.shape, testX.shape, testY.shape)
 
 # define a model
 network   = PiT(out_dim, encode_dim, n_head, 2, 2)
-inputs1   = tf.keras.Input(shape=m_train.shape[1:])
-inputs2   = tf.keras.Input(shape=trainX.shape[1:])
-outputs   = network(inputs1,inputs2)
-model     = tf.keras.Model([inputs1,inputs2], outputs)
+inputs   = tf.keras.Input(shape=trainX.shape[1:])
+outputs   = network(inputs)
+model     = tf.keras.Model(inputs, outputs)
 network.summary()
 
 
@@ -31,7 +30,7 @@ model.load_weights('./512/checkpoints/my_checkpoint').expect_partial()
 
 ### evaluation, visualization
 index = 89
-pred  = model.predict([m_test,testX])
+pred  = model.predict(testX)
 print(rel_norm()(testY, pred))
 pred  = pred[index:index+1,...]
 true = testY[index:index+1,...]
