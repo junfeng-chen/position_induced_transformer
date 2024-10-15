@@ -115,7 +115,7 @@ class MultiHeadPosAtt(tf.keras.layers.Layer):
         self.built = True
 
     def call(self, inputs):
-        scaled_dist = self.dist * self.r**2å
+        scaled_dist = self.dist * self.r**2
         if self.locality <= 100:
             mask = tfp.stats.percentile(scaled_dist, self.locality, interpolation="linear", axis=-1, keepdims=True)
             scaled_dist = tf.where(scaled_dist<=mask, scaled_dist, tf.float32.max)

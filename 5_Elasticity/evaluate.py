@@ -15,14 +15,13 @@ n_test      = 200
 
 # load dataset
 trainX, trainY, testX, testY= load_data("./", n_train, n_test)
-print(m_train.shape, m_test.shape, trainX.shape, trainY.shape, testX.shape, testY.shape)
+print(trainX.shape, trainY.shape, testX.shape, testY.shape)
 
 # define a model
 network   = PiT(out_dim, encode_dim, n_head, 2, 2)
-inputs1   = tf.keras.Input(shape=m_train.shape[1:])
-inputs2   = tf.keras.Input(shape=trainX.shape[1:])
-outputs   = network(inputs1,inputs2)
-model     = tf.keras.Model([inputs1,inputs2], outputs)
+inputs   = tf.keras.Input(shape=trainX.shape[1:])
+outputs   = network(inputs)
+model     = tf.keras.Model(inputs, outputs)
 network.summary()
 
 
