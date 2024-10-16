@@ -181,3 +181,59 @@ class pit_fixed(pit):
         self.down     = posatt_cross_fixed(self.n_head, self.in_dim, self.en_local)
         self.conv     = torch.nn.ModuleList([posatt_fixed(self.n_head, self.hid_dim, 1.0) for _ in range(self.n_blocks)])
         self.up       = posatt_cross_fixed(self.n_head, self.hid_dim, self.de_local)
+##############################
+class posatt_periodic1d(posatt_fixed):
+    def __init__(self, n_head, in_dim, locality):
+        super(posatt_periodic1d, self).__init__(n_head, in_dim, locality)
+
+    def dist2att(self, mesh_out, mesh_in, scale, locality):
+        dx          = torch.abs(mesh_in[1,0] - mesh_in[0,0])
+        l           = dx * mesh_in.shape[0]
+        m_diff      = abs(mesh_out.unsqueeze(-2) - mesh_in.unsqueeze(-3))
+        m_diff      = torch.minimum(m_diff, l-m_diff)
+        m_dist      = m_diff[...,0]**2
+        scaled_dist = m_dist * torch.tan(0.25*pi*(1-1e-7)*(1.0+torch.sin(scale))) # (n_head, L_out, L_in)
+        mask        = torch.quantile(scaled_dist, locality, dim=-1, keepdim=True) 
+        scaled_dist = torch.where(scaled_dist <= mask, scaled_dist, torch.tensor(torch.finfo(torch.float32).max, device=scaled_dist.device))
+        scaled_dist = -scaled_dist
+        return torch.nn.Softmax(dim=-1)(scaled_dist)
+
+class posatt_cross_periodic1d(posatt_periodic1d):
+
+    def __init__(self, n_head, in_dim, locality):
+        super(posatt_cross_periodic1d, self).__init__(n_head, in_dim, locality)
+
+    def forward(self, mesh_out, mesh_in, inputs):
+        """
+        mesh_out: (L_out, 2)
+        mesh_in: (L_in, 2)
+        inputs: (batch, L_in, in_dim)
+        """
+        att        = self.dist2att(mesh_out, mesh_in, self.lmda, self.locality)
+        convoluted = self.convolution(att, inputs)
+        return convoluted
+
+class pit_periodic1d(pit):
+    def __init__(self,
+                 space_dim,  
+                 in_dim, 
+                 out_dim, 
+                 hid_dim,
+                 n_head, 
+                 n_blocks,
+                 mesh_ltt,
+                 en_loc, 
+                 de_loc):
+
+        super(pit_periodic1d, self).__init__(space_dim,  
+                 in_dim, 
+                 out_dim, 
+                 hid_dim,
+                 n_head, 
+                 n_blocks,
+                 mesh_ltt,
+                 en_loc, 
+                 de_loc)
+        self.down     = posatt_cross_periodic1d(self.n_head, self.in_dim, self.en_local)
+        self.conv     = torch.nn.ModuleList([posatt_periodic1d(self.n_head, self.hid_dim, 1.0) for _ in range(self.n_blocks)])
+        self.up       = posatt_cross_periodic1d(self.n_head, self.hid_dim, self.de_local)

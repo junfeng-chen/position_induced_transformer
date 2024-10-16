@@ -46,7 +46,7 @@ class pit_darcy(pit_fixed):
 
     def forward(self, mesh_in, func_in, mesh_out):
         '''
-        func_in: (batch_size, L, self.space_dim)
+        func_in: (batch_size, L, self.in_dim)
         ext: (batch_size, h, w, self.space_dim)
         '''
         size     = mesh_out.shape[:-1]
@@ -82,6 +82,8 @@ x_train = x_normalizer.normalize(x_train)
 x_test = x_normalizer.normalize(x_test)
 y_normalizer = PixelWiseNormalization(y_train)
 
+
+### This part of code for mesh generation is adapted from Li et al. (Fourier Neural Operator for Parametric Partial Differential Equations)
 mesh = []
 mesh.append(np.linspace(0, 1, s))
 mesh.append(np.linspace(0, 1, s))
@@ -96,7 +98,7 @@ mesh_ltt.append(np.linspace(0, 1, s_ltt))
 mesh_ltt = np.vstack([xx.ravel() for xx in np.meshgrid(*mesh_ltt)]).T
 mesh_ltt = mesh_ltt.reshape(s_ltt,s_ltt,2)
 mesh_ltt = torch.tensor(mesh_ltt, dtype=torch.float).cuda()
-
+#######
 train_loader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(x_train, y_train), batch_size=batch_size, shuffle=True)
 test_loader = torch.utils.data.DataLoader(torch.utils.data.TensorDataset(x_test, y_test), batch_size=10, shuffle=False)
 ################################################################
@@ -114,7 +116,7 @@ model = pit_darcy(space_dim=2,
 model = torch.compile(model)
 print(count_params(model))
 
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=iterations)
   
 myloss = RelLpNorm(out_dim=1, p=2) # LpLoss(size_average=False)
