@@ -2,7 +2,6 @@ from pit import *
 from timeit import default_timer
 import matplotlib.pyplot as plt
 from scipy.io import loadmat, savemat
-# from utilities3 import *
 from utils import *
 
 def load_data(train_path, test_path, downsampling, ntrain, ntest):
@@ -53,12 +52,9 @@ class pit_darcy(pit_fixed):
         mesh_in  = mesh_in.reshape(-1, self.space_dim)
         func_in  = func_in.reshape(func_in.shape[0], -1, self.in_dim)
         mesh_out = mesh_out.reshape(-1, self.space_dim)
-        ## Encoder
         func_in  = torch.cat((torch.tile(mesh_in.unsqueeze(0), [func_in.shape[0],1,1]), func_in),-1)
         func_ltt = self.encoder(mesh_in, func_in, self.mesh_ltt)
-        # Processor
         func_ltt   = self.processor(func_ltt, self.mesh_ltt)
-        # Decoder
         func_out   = self.decoder(self.mesh_ltt, func_ltt, mesh_out)
         return func_out.reshape(func_in.shape[0], *size, self.out_dim)
 

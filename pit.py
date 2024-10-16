@@ -9,7 +9,7 @@ from torch.nn.functional import gelu
 import numpy as np
 np.random.seed(0)
 from math import pi
-
+        
 class kaiming_mlp(nn.Module): 
     def __init__(self, n_filters0, n_filters1, n_filters2): 
         super(kaiming_mlp, self).__init__() 
@@ -237,3 +237,61 @@ class pit_periodic1d(pit):
         self.down     = posatt_cross_periodic1d(self.n_head, self.in_dim, self.en_local)
         self.conv     = torch.nn.ModuleList([posatt_periodic1d(self.n_head, self.hid_dim, 1.0) for _ in range(self.n_blocks)])
         self.up       = posatt_cross_periodic1d(self.n_head, self.hid_dim, self.de_local)
+################
+
+class posatt_periodic2d(posatt_fixed):
+    def __init__(self, n_head, in_dim, locality):
+        super(posatt_periodic2d, self).__init__(n_head, in_dim, locality)
+
+    def dist2att(self, mesh_out, mesh_in, scale, locality):
+        res         = int(mesh_in.shape[0]**0.5)
+        dx          =( torch.max(mesh_in[:,0]) - torch.min(mesh_in[:,0]) ) / (res - 1)
+        l           = dx * res
+        m_diff      = abs(mesh_out.unsqueeze(-2) - mesh_in.unsqueeze(-3))
+        m_diff      = torch.minimum(m_diff, l-m_diff)
+        m_dist      = torch.sum(m_diff**2, dim=-1)
+        scaled_dist = m_dist * torch.tan(0.25*pi*(1-1e-7)*(1.0+torch.sin(scale))) # (n_head, L_out, L_in)
+        mask        = torch.quantile(scaled_dist, locality, dim=-1, keepdim=True) 
+        scaled_dist = torch.where(scaled_dist <= mask, scaled_dist, torch.tensor(torch.finfo(torch.float32).max, device=scaled_dist.device))
+        scaled_dist = -scaled_dist
+        return torch.nn.Softmax(dim=-1)(scaled_dist)
+
+class posatt_cross_periodic2d(posatt_periodic2d):
+
+    def __init__(self, n_head, in_dim, locality):
+        super(posatt_cross_periodic2d, self).__init__(n_head, in_dim, locality)
+
+    def forward(self, mesh_out, mesh_in, inputs):
+        """
+        mesh_out: (L_out, 2)
+        mesh_in: (L_in, 2)
+        inputs: (batch, L_in, in_dim)
+        """
+        att        = self.dist2att(mesh_out, mesh_in, self.lmda, self.locality)
+        convoluted = self.convolution(att, inputs)
+        return convoluted
+
+class pit_periodic2d(pit):
+    def __init__(self,
+                 space_dim,  
+                 in_dim, 
+                 out_dim, 
+                 hid_dim,
+                 n_head, 
+                 n_blocks,
+                 mesh_ltt,
+                 en_loc, 
+                 de_loc):
+
+        super(pit_periodic2d, self).__init__(space_dim,  
+                 in_dim, 
+                 out_dim, 
+                 hid_dim,
+                 n_head, 
+                 n_blocks,
+                 mesh_ltt,
+                 en_loc, 
+                 de_loc)
+        self.down     = posatt_cross_periodic2d(self.n_head, self.in_dim, self.en_local)
+        self.conv     = torch.nn.ModuleList([posatt_periodic2d(self.n_head, self.hid_dim, 1.0) for _ in range(self.n_blocks)])
+        self.up       = posatt_cross_periodic2d(self.n_head, self.hid_dim, self.de_local)

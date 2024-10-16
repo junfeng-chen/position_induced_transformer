@@ -104,7 +104,6 @@ class RelLpNorm(object):
         # Reshape true and pred
         true_reshaped = true.reshape(true.size(0), -1, self._out_dim)  # (batch_size, L, out_dim)
         pred_reshaped = pred.reshape(pred.size(0), -1, self._out_dim)  # (batch_size, L, out_dim)
-
         # Compute the L2 norm along the second dimension (L)
         true_norm = torch.norm(true_reshaped, p=self._ord, dim=1)  # (batch_size, out_dim)
         pred_diff_norm = torch.norm(true_reshaped - pred_reshaped, p=self._ord, dim=1)  # (batch_size, out_dim)
