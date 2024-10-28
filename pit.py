@@ -106,7 +106,7 @@ class pit(nn.Module):
 
     def encoder(self, mesh_in, func_in, mesh_ltt):
         func_ltt = self.down(mesh_ltt, mesh_in, func_in)
-        func_ltt = self.en_layer(func_ltt )
+        func_ltt = self.en_layer(func_ltt)
         func_ltt = gelu(func_ltt )
         return func_ltt 
 
