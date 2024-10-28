@@ -56,23 +56,6 @@ def count_params(model):
                     list(p.size()))
     return c
 
-class L01Norm(object):
-    def __init__(self, out_dim):
-        super(RelL01Norm, self).__init__()
-        self._out_dim = out_dim
-
-    def __call__(self, true, pred):
-        # Reshape true and pred
-        true_reshaped = true.view(true.size(0), -1, self._out_dim)  # (batch_size, L, out_dim)
-        pred_reshaped = pred.view(pred.size(0), -1, self._out_dim)  # (batch_size, L, out_dim)
-
-        abs_err       = torch.abs(true_reshaped - pred_reshaped)
-        weights       = torch.nn.Softmax(dim=1)(abs_err)
-        weighted_err  = abs_err * weights
-        l01_loss      = torch.sum(weighted_err, dim=1)
-        
-        return torch.sum(torch.mean(l01_loss, dim=-1))
-
 class RelMaxNorm(object):
     def __init__(self, out_dim):
         super(RelMaxNorm, self).__init__()
