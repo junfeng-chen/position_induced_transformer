@@ -1,0 +1,6 @@
+./*.npy
+*.pdf
+*.pth
+./*.mat
+*.log
+__pycache__
