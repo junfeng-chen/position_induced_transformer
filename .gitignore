@@ -1,6 +1,7 @@
-./*.npy
+*.npy
 *.pdf
 *.pth
-./*.mat
+*.mat
 *.log
+*.csv
 __pycache__

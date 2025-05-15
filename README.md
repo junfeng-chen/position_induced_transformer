@@ -1,14 +1,19 @@
 # Position-induced Transformer
 
-The code in this repository presents six numerical experiments of using Position-induced Transformer (PiT) for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be downloaded <a href="https://arxiv.org/pdf/2405.09285">here</a>.
+The code in this repository presents six numerical experiments of using **Position-induced Transformer (PiT)** for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be accessed <a href="https://www.alphaxiv.org/pdf/2405.09285">here</a>.
 
+## Update May 2025
+- PiT is now part of **<a href="https://github.com/AI4Equations/due">DUE</a>**, our open-source toolkit data-driven equation modeling with modern deep learning methods. For installation and examples, visit the <a href="https://arxiv.org/pdf/2405.09285">GitHub repository</a>. 
+- We alos published a review paper on deep learning approaches for equation modeling-preprint can be accessed here <a href="https://www.alphaxiv.org/abs/2504.10373">here</a>.
+- Added a numerical example showcasing PiT for learning the unsteady flow past a cylinder.
 ## Contents
-- The numerical experiment on the one-dimensional inviscid Burgers' equation.
-- The numerical experiment on the one-dimensional compressible Euler equations.
-- The numerical experiment on the two-dimensional Darcy flow problem.
-- The numerical experiment on the two-dimensional incompressible Navier&ndash;Stokes equations.
-- The numerical experiment on the two-dimensional hyper-elastic problem.
-- The numerical experiment on the two-dimensional compressible Euler equations.
+- `train_burgers`: One-dimensional inviscid Burgers' equation.
+- `train_sod`: One-dimensional compressible Euler equations.
+- `train_darcy`: Two-dimensional Darcy flow problem.
+- `train_vorticity`: Two-dimensional incompressible Navier&ndash;Stokes equations with periodic boundary conditions.
+- `train_elasticity`: Two-dimensional hyper-elastic problem.
+- `train_naca`: Two-dimensional transonic flow over airfoils.
+- `train_cylinder`: Two-dimensional flow past cylinder at Reynolds number equal to 100.
 
 ## Datasets
 The raw data required to reproduce the main results can be obtained from some of the baseline methods selected in our paper.
@@ -26,7 +31,7 @@ The raw data required to reproduce the main results can be obtained from some of
 @inproceedings{chen2024positional,
                title={Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning},
                author={Junfeng Chen and Kailiang Wu},
-               booktitle={International conference on machine learning},
+               booktitle={International Conference on Machine Learning},
                year={2024},
                organization={PMLR}
 }

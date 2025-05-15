@@ -18,7 +18,8 @@ class kaiming_mlp(nn.Module):
         nn.init.kaiming_normal_(self.mlp1.weight)
         nn.init.kaiming_normal_(self.mlp2.weight)
  
-    def forward(self, x): 
+    def forward(self, x):
+        # print(x.shape)
         x = self.mlp1(x)
         x = gelu(x)
         x = self.mlp2(x)
@@ -72,10 +73,10 @@ class posatt_cross(posatt):
 class pit(nn.Module):
     def __init__(self,
                  space_dim,  
-                 in_dim, 
-                 out_dim, 
+                 in_dim,
+                 out_dim,
                  hid_dim,
-                 n_head, 
+                 n_head,
                  n_blocks,
                  mesh_ltt,
                  en_loc, 
@@ -160,23 +161,23 @@ class posatt_cross_fixed(posatt_fixed):
 class pit_fixed(pit):
     def __init__(self,
                  space_dim,  
-                 in_dim, 
-                 out_dim, 
+                 in_dim,
+                 out_dim,
                  hid_dim,
-                 n_head, 
+                 n_head,
                  n_blocks,
                  mesh_ltt,
-                 en_loc, 
+                 en_loc,
                  de_loc):
 
-        super(pit_fixed, self).__init__(space_dim,  
-                 in_dim, 
+        super(pit_fixed, self).__init__(space_dim, 
+                 in_dim,
                  out_dim, 
                  hid_dim,
-                 n_head, 
+                 n_head,
                  n_blocks,
                  mesh_ltt,
-                 en_loc, 
+                 en_loc,
                  de_loc)
         self.down     = posatt_cross_fixed(self.n_head, self.in_dim, self.en_local)
         self.conv     = torch.nn.ModuleList([posatt_fixed(self.n_head, self.hid_dim, 1.0) for _ in range(self.n_blocks)])
