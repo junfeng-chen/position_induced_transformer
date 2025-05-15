@@ -1,10 +1,10 @@
 # Position-induced Transformer
 
-The code in this repository presents six numerical experiments of using **Position-induced Transformer (PiT)** for learing operators in partial differential equations. PiT is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be accessed <a href="https://www.alphaxiv.org/pdf/2405.09285">here</a>.
+The code in this repository presents the implementation of **Position-induced Transformer (PiT)** and the numerical experiments of using PiT for learing operators in partial differential equations. It is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be accessed <a href="https://www.alphaxiv.org/pdf/2405.09285">here</a>.
 
 ## Update May 2025
-- PiT is now part of **<a href="https://github.com/AI4Equations/due">DUE</a>**, our open-source toolkit data-driven equation modeling with modern deep learning methods. For installation and examples, visit the <a href="https://arxiv.org/pdf/2405.09285">GitHub repository</a>. 
-- We alos published a review paper on deep learning approaches for equation modeling-preprint can be accessed here <a href="https://www.alphaxiv.org/abs/2504.10373">here</a>.
+- PiT is now part of **<a href="https://github.com/AI4Equations/due">DUE</a>**, our open-source toolkit for data-driven equation modeling with modern deep learning methods. For installation and examples, visit the <a href="https://github.com/AI4Equations/due">GitHub repository</a>. 
+- We also published a review paper on deep learning approaches for equation modeling-preprint can be accessed <a href="https://www.alphaxiv.org/abs/2504.10373">here</a>.
 - Added a numerical example showcasing PiT for learning the unsteady flow past a cylinder.
 ## Contents
 - `train_burgers`: One-dimensional inviscid Burgers' equation.
@@ -17,9 +17,10 @@ The code in this repository presents six numerical experiments of using **Positi
 
 ## Datasets
 The raw data required to reproduce the main results can be obtained from some of the baseline methods selected in our paper.
-- For InviscidBurgers and ShockTube, data sets are provided in <a href="https://openreview.net/pdf?id=CrfhZAsJDsZ">Lanthaler et al.</a> They can be downloaded <a href="https://zenodo.org/records/7118642">here</a>.
-- For Darcy2D and Vorticity, data sets are provided by <a href="https://openreview.net/pdf?id=c8P9NQVtmnO">Li et al</a>. They can be downloaded <a href="https://drive.google.com/drive/folders/1UnbQh2WWc6knEHbLn-ZaXrKUZhp7pjt-">here</a>.
-- For Elasticity and NACA, data sets are provided by <a href="https://www.jmlr.org/papers/volume24/23-0064/23-0064.pdf">Li et al</a>. They can be downloaded <a href="https://drive.google.com/drive/folders/1YBuaoTdOSr_qzaow-G-iwvbUI7fiUzu8">here</a>.
+- For InviscidBurgers and ShockTube, datasets are provided in <a href="https://openreview.net/pdf?id=CrfhZAsJDsZ">Lanthaler et al.</a> They can be downloaded <a href="https://zenodo.org/records/7118642">here</a>.
+- For Darcy2D and Vorticity, datasets are provided by <a href="https://openreview.net/pdf?id=c8P9NQVtmnO">Li et al</a>. They can be downloaded <a href="https://drive.google.com/drive/folders/1UnbQh2WWc6knEHbLn-ZaXrKUZhp7pjt-">here</a>.
+- For Elasticity and NACA, datasets are provided by <a href="https://www.jmlr.org/papers/volume24/23-0064/23-0064.pdf">Li et al</a>. They can be downloaded <a href="https://drive.google.com/drive/folders/1YBuaoTdOSr_qzaow-G-iwvbUI7fiUzu8">here</a>.
+- For Cylinder, the dataset is generated using <a href="https://fenicsproject.org/">FEniCS</a>. It can be downloaded <a href="https://drive.google.com/drive/folders/1efL-RR_H43Pe6P5BLtcEPFgz7ZmXnl5a">here</a>.
 
 ## Requirements
 - This code is primarily based on PyTorch. We have observed significant improvements in PiT's training speed with PyTorch 2.x, especially when using `torch.compile`. Therefore, we highly recommend using PyTorch 2.x with `torch.compile` enabled for optimal performance.
