@@ -2,9 +2,8 @@
 
 The code in this repository presents the implementation of **Position-induced Transformer (PiT)** and the numerical experiments of using PiT for learing operators in partial differential equations. It is built upon the position-attention mechanism, proposed in the paper *Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning*. The paper can be accessed <a href="https://www.alphaxiv.org/pdf/2405.09285">here</a>.
 
-## Update May 2025
+## Updates May 2025
 - PiT is now part of **<a href="https://github.com/AI4Equations/due">DUE</a>**, our open-source toolkit for data-driven equation modeling with modern deep learning methods. For installation and examples, visit the <a href="https://github.com/AI4Equations/due">GitHub repository</a>. 
-- We also published a review paper on deep learning approaches for equation modeling-preprint can be accessed <a href="https://www.alphaxiv.org/abs/2504.10373">here</a>.
 - Added a numerical example showcasing PiT for learning the unsteady flow past a cylinder.
 ## Contents
 - `train_burgers`: One-dimensional inviscid Burgers' equation.
