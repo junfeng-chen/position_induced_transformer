@@ -29,10 +29,11 @@ The raw data required to reproduce the main results can be obtained from some of
 ## Citations
 ```
 @inproceedings{chen2024positional,
-               title={Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning},
-               author={Junfeng Chen and Kailiang Wu},
-               booktitle={International Conference on Machine Learning},
-               year={2024},
-               organization={PMLR}
+  title={Positional Knowledge is All You Need: Position-induced Transformer (PiT) for Operator Learning},
+  author={Chen, Junfeng and Wu, Kailiang},
+  booktitle={International Conference on Machine Learning},
+  pages={7526--7552},
+  year={2024},
+  organization={PMLR}
 }
 ```
